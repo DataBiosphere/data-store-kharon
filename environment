@@ -1,0 +1,33 @@
+# HCA DDS environment variables
+#
+# Source this file in your bash shell using "source environment".
+#
+# The environment variables set in this file are appropriate for the
+# HCA DDS development environment. Individual environment variable
+# values are overridden when deployed, based on the deployment stage.
+# That logic resides in {chalice,daemons}/build_deploy_config.sh.
+
+# Resolve the location of this file and set DDS_HOME to the root
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ] ; do SOURCE="$(readlink "$SOURCE")"; done
+export DDS_HOME="$(cd -P "$(dirname "$SOURCE")" && pwd)"
+
+EXPORT_ENV_VARS_TO_LAMBDA_ARRAY=(
+    DDS_DEPLOYMENT_STAGE
+)
+
+set -a
+EXPORT_ENV_VARS_TO_LAMBDA=${EXPORT_ENV_VARS_TO_LAMBDA_ARRAY[*]}
+DDS_DEPLOYMENT_STAGE=dev
+DDS_GCP_SERVICE_ACCOUNT_NAME="dds-delete"
+DDS_TERRAFORM_BACKEND_BUCKET_TEMPLATE="org-humancellatlas-{account_id}-terraform"
+AWS_DEFAULT_OUTPUT=json
+AWS_DEFAULT_REGION=us-east-1
+GCP_DEFAULT_REGION=us-central1
+DDS_SECRETS_STORE="dcp/dds"
+DDS_GCP_CREDENTIALS_SECRET="gcp-credentials.json"
+set +a
+
+if [[ -f "${DDS_HOME}/environment.local" ]]; then
+    source "${DDS_HOME}/environment.local"
+fi
