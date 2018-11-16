@@ -26,6 +26,7 @@ AWS_DEFAULT_REGION=us-east-1
 GCP_DEFAULT_REGION=us-central1
 DDS_SECRETS_STORE="dcp/dds"
 DDS_GCP_CREDENTIALS_SECRET="gcp-credentials.json"
+DSS_S3_BUCKET_TEST_FIXTURES="org-hca-dss-test-fixtures"
 set +a
 
 if [[ -f "${DDS_HOME}/environment.local" ]]; then

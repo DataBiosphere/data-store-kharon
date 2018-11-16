@@ -25,3 +25,7 @@ Run `source environment` now and whenever these environment files are modified.
 Now deploy using make:
 
     `make deploy`
+
+## Tests
+
+1. Tests rely on the test fixtures bucket from the data-store repo, DSS_S3_BUCKET_TEST_FIXTURES. For instructions on populating test fixtures, see https://github.com/HumanCellAtlas/data-store/blob/master/README.md
