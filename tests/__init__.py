@@ -4,7 +4,7 @@ import functools
 
 logger = logging.getLogger(__name__)
 
-def eventually(timeout: float, interval: float, errors: set={AssertionError}):
+def eventually(timeout: float, interval: float, errors: set = {AssertionError}):
     """
     @eventually runs a test until all assertions are satisfied or a timeout is reached.
     :param timeout: time until the test fails

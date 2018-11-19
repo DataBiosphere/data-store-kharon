@@ -1,0 +1,49 @@
+image: humancellatlas/dss-build-box
+# The Docker image `humancellatlas/dss-build-box` is created through a manual process from
+# `${DSS_HOME}/Dockerfile.allspark`. See the contents of `${DSS_HOME}/Dockerfile.allspark`
+# creation and usage instructions.
+
+stages:
+  - test
+  - deploy
+
+before_script:
+  - export COMMITS_URL=${GITHUB_API}/repos/HumanCellAtlas/kharon/commits
+  - if not [[ CI_COMMIT_SHA == $(http GET $COMMITS_URL sha==$CI_COMMIT_REF_NAME | jq -r '.[0]["sha"]') ]]; then exit 1; fi
+# TODO: figure out how to get the gitlab-runner to not clone the repo as root - Brian H
+  - cp -r /HumanCellAtlas/kharon ~/kharon && cd ~/kharon
+  - git reset --hard HEAD
+  - virtualenv ~/venv
+  - source ~/venv/bin/activate
+  - pip install -r requirements.txt
+  - source environment
+  - if [[ master == $CI_COMMIT_REF_NAME ]]; then
+  -   DDS_ENV="dev"
+  - elif [[ -f "environment.$CI_COMMIT_REF_NAME" ]]; then
+  -   DDS_ENV=$CI_COMMIT_REF_NAME
+  -   source environment.$DDS_ENV
+  - fi
+  - scripts/fetch_secret.sh gcp-credentials.json > gcp-credentials.json
+  - export GOOGLE_APPLICATION_CREDENTIALS=$(pwd -P)/gcp-credentials.json
+
+test:
+  stage: test
+  script:
+    - make test
+  except:
+    - tags
+    - schedules
+
+deploy:
+  stage: deploy
+  script:
+    - make plan-infra
+    - make deploy
+  environment:
+    name: $DDS_ENV
+  only:
+    - master
+    - integration
+    - staging
+  except:
+    - schedules

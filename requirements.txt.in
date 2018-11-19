@@ -1,0 +1,11 @@
+# Be sure to run "make requirements.txt after editing this file.
+flake8  >= 3.4.1
+mypy  >= 0.530
+coverage  >= 4.4.1
+domovoi
+awscli
+hca
+pytz
+cloud_blobstore
+elasticsearch
+requests_aws4auth
