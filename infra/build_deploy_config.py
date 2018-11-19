@@ -42,6 +42,7 @@ provider google {{
 
 env_vars_to_infra = [
     "AWS_DEFAULT_REGION",
+    "DDS_DEPLOYMENT_STAGE",
     "DDS_GCP_SERVICE_ACCOUNT_NAME",
 ]
 

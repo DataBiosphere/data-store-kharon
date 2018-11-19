@@ -72,7 +72,7 @@ def _delete(replica, key):
         bucket = BUCKETS[replica]
         handle.get_size(bucket, key)
         handle.delete(bucket, key)
-        logger.info(f"Deleted {replica} {bucket}/{key}")
+        logger.info(f"Deleted {key} from bucket:{bucket} replica:{replica}")
     except BlobNotFoundError:
         pass
 

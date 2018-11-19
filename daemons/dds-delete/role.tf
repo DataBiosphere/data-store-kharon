@@ -7,7 +7,8 @@ data "aws_iam_policy_document" "dds_delete_policy" {
       "s3:List*"
     ]
     resources = [
-      "arn:aws:s3:::${var.DSS_S3_BUCKET}/*",
+      "arn:aws:s3:::${var.DSS_S3_BUCKET}",
+      "arn:aws:s3:::${var.DSS_S3_BUCKET}/*"
     ]
   }
   statement {
@@ -27,7 +28,8 @@ data "aws_iam_policy_document" "dds_delete_policy" {
       "logs:PutLogEvents"
     ]
     resources = [
-      "arn:aws:logs:*:${var.account_id}:log-group:/aws/lambda/dds-delete-${var.DDS_DEPLOYMENT_STAGE}"
+      "arn:aws:logs:*:${var.account_id}:log-group:/aws/lambda/dds-delete-${var.DDS_DEPLOYMENT_STAGE}",
+      "arn:aws:logs:*:${var.account_id}:log-group:/aws/lambda/dds-delete-${var.DDS_DEPLOYMENT_STAGE}:*:*"
     ]
   }
   statement {
