@@ -1,8 +1,18 @@
+import os
+import sys
 import time
 import logging
 import functools
 
+pkg_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))  # noqa
+sys.path.insert(0, pkg_root)  # noqa
+
+import dds.utils
+
+
 logger = logging.getLogger(__name__)
+if not os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'):
+    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = dds.utils.get_gcp_credentials_file().name
 
 def eventually(timeout: float, interval: float, errors: set = {AssertionError}):
     """

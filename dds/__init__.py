@@ -43,7 +43,10 @@ def get_handle(replica):
     if "aws" == replica:
         return S3BlobStore(boto3.client("s3"))
     elif "gcp" == replica:
-        return GSBlobStore(Client())
+        gcp_client = Client.from_service_account_json(
+            os.environ['GOOGLE_APPLICATION_CREDENTIALS'],
+        )
+        return GSBlobStore(gcp_client)
     else:
         msg = f"Unknown replica {replica}"
         logger.error(msg)
