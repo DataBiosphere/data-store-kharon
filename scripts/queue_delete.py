@@ -10,6 +10,7 @@ import os
 import json
 import boto3
 import argparse
+from uuid import uuid4
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
@@ -17,28 +18,31 @@ stage = os.environ['DDS_DEPLOYMENT_STAGE']
 account_id = boto3.client("sts").get_caller_identity()['Account']
 region = os.environ['AWS_DEFAULT_REGION']
 _queue_url = f"https://sqs.{region}.amazonaws.com/{account_id}/dds-delete-{stage}"
-sqs_client = boto3.client("sqs")
 
 
-def enqueue(key):
+def enqueue(sqs_client, key):
     sqs_client.send_message(
         QueueUrl=_queue_url,
         MessageBody=json.dumps({"key":key}),
     )
 
 
-def _enqueue_batch(keys):
+def _enqueue_batch(sqs_client, keys):
     assert 10 >= len(keys)
-    ids = [key.split("/", 1)[1].split(".", 1)[0]  for key in keys]
-    sqs_client.send_message_batch(
-        QueueUrl=_queue_url,
-        Entries=[
-            dict(Id=id, MessageBody=json.dumps({"key":key}))
-            for id, key in zip(ids, keys)
-        ]
-    )
+    ids = [str(uuid4()) for _ in keys]
+    try:
+        resp = sqs_client.send_message_batch(
+            QueueUrl=_queue_url,
+            Entries=[
+                dict(Id=id, MessageBody=json.dumps({"key":key}))
+                for id, key in zip(ids, keys)
+            ]
+        )
+    except Exception as e:
+        print(e)
+    return resp
 
-def enqueue_batch(keys, parallel=True):
+def enqueue_batch(sqs_client, keys, parallel=True):
     chunks = list()
     while keys:
         chunks.append(keys[:10])
@@ -46,20 +50,21 @@ def enqueue_batch(keys, parallel=True):
 
     if parallel:
         with ThreadPoolExecutor(10) as executor:
-            executor.map(_enqueue_batch, chunks)
+            executor.map(lambda keys: _enqueue_batch(sqs_client, keys), chunks)
     else:
         for chunk in chunks:
-            _enqueue_batch(chunk)
+            _enqueue_batch(sqs_client, chunk)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("key_or_file")
     parser.add_argument("-d", "--stage", default="dev", choices=["dev", "integration", "staging", "prod"])
     args = parser.parse_args()
+    sqs_client = boto3.client("sqs")
 
     if os.path.isfile(args.key_or_file):
         with open(args.key_or_file, "r") as fh:
             keys = fh.read().split()
-        enqueue_batch(keys)
+        enqueue_batch(sqs_client, keys)
     else:
-        enqueue(args.key_or_file)
+        enqueue(sqs_client, args.key_or_file)

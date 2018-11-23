@@ -18,14 +18,16 @@ import queue_delete
 
 
 def process_prefix(handle, bucket, pfx):
+    sqs_client = boto3.client("sqs")
     keys = list()
     for key in handle.list(bucket, pfx):
         keys.append(key)
         if 1000 == len(keys):
-            queue_delete.enqueue_batch(keys, parallel=False)
+            print(f"queuing {len(keys)} for deletion")
+            queue_delete.enqueue_batch(sqs_client, keys, parallel=False)
             keys = list()
     if len(keys):
-        queue_delete.enqueue_batch(keys, parallel=False)
+        queue_delete.enqueue_batch(sqs_client, keys, parallel=False)
 
 
 def enqueue_bucket(handle, bucket):
