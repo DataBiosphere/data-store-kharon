@@ -36,18 +36,12 @@ def enqueue_bucket(handle, bucket):
                 for kind in ["blobs", "files", "bundles", "collections"]
                 for c in digits]
     with ThreadPoolExecutor(10) as executor:
-        futures = [executor.submit(process_prefix, handle, bucket, pfx)
-                   for pfx in prefixes]
-        for future in as_completed(futures):
-            try:
-                future.result()
-            except Exception as e:
-                print(e)
+        executor.map(lambda pfx: process_prefix(handle, bucket, pfx), prefixes)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--replica", default="aws", choices=["aws", "gcp"])
+    parser.add_argument("replica", choices=["aws", "gcp"])
     parser.add_argument("-d", "--stage", default="dev", choices=["dev", "integration", "staging", "prod"])
     args = parser.parse_args()
 

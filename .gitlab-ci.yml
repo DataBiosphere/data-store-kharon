@@ -6,6 +6,7 @@ image: humancellatlas/dss-build-box
 stages:
   - test
   - deploy
+  - delete
 
 before_script:
   - export COMMITS_URL=${GITHUB_API}/repos/HumanCellAtlas/kharon/commits
@@ -47,3 +48,23 @@ deploy:
     - staging
   except:
     - schedules
+
+inclusion-protected-delete:
+  stage: delete
+  script:
+    - scripts/queue_delete_all_items.py $DDS_DELETE_WITH_REPLICA -d dev
+  only:
+    refs:
+      - schedules
+    variables:
+      - $DDS_DELETE_WITH_REPLICA
+
+verify-inclusion-list:
+  stage: delete
+  script:
+    - scripts/verify_inclusion_list.py
+  only:
+    refs:
+      - schedules
+    variables:
+      - $DDS_VERIFY_INCLUSION_LIST
