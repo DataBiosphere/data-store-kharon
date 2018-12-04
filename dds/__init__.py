@@ -77,6 +77,7 @@ def _delete(replica, key):
         handle.delete(bucket, key)
         logger.info(f"Deleted {key} from bucket:{bucket} replica:{replica}")
     except BlobNotFoundError:
+        logger.info(f"Object not fonud: {key} bucket:{bucket} replica:{replica}")
         pass
 
 def delete(key):

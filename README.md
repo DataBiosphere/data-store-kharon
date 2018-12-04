@@ -20,7 +20,7 @@ Run `source environment` now and whenever these environment files are modified.
 
 1. Deploy the GCP service account with `make gcp-service-account`
 1. Visit the GCP console and create the json key for the new service account
-1. Execute the command `scripts/set_secret.py --secret-name $GOOGLE_APPLICATION_CREDENTIALS_SECRETS_NAME < gcp-credentials.json`
+1. Execute the command `scripts/set_secret.py --secret-name $DDS_GCP_CREDENTIALS_SECRET < gcp-credentials.json`
 
 Now deploy using make:
 
