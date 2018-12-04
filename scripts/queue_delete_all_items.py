@@ -42,7 +42,6 @@ def enqueue_bucket(handle, bucket):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("replica", choices=["aws", "gcp"])
-    parser.add_argument("-d", "--stage", default="dev", choices=["dev", "integration", "staging", "prod"])
     args = parser.parse_args()
 
     handle = dds.get_handle(args.replica)

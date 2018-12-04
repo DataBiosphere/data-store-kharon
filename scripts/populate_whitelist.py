@@ -73,7 +73,7 @@ def populate_whitelist(keys):
 
     for chunk in chunks:
         request_items = {
-            'dds-whitelist-dev': [
+            f"dds-whitelist-{os.environ['DDS_DEPLOYMENT_STAGE']}": [
                 {
                     'PutRequest': {
                         'Item': {
@@ -93,7 +93,6 @@ def populate_whitelist(keys):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("keys_file", help="File containing list of items with format {type}/{uuid}.{version}. One item per line.")
-    parser.add_argument("-d", "--stage", default="dev", choices=["dev", "integration", "staging", "prod"], help="deployment stage.")
     args = parser.parse_args()
 
     with open(args.keys_file, "r") as fh:

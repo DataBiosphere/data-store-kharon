@@ -58,7 +58,6 @@ def enqueue_batch(sqs_client, keys, parallel=True):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("key_or_file")
-    parser.add_argument("-d", "--stage", default="dev", choices=["dev", "integration", "staging", "prod"])
     args = parser.parse_args()
     sqs_client = boto3.client("sqs")
 

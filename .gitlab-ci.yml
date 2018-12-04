@@ -52,7 +52,7 @@ deploy:
 inclusion-protected-delete:
   stage: delete
   script:
-    - scripts/queue_delete_all_items.py $DDS_DELETE_WITH_REPLICA -d dev
+    - scripts/queue_delete_all_items.py $DDS_DELETE_WITH_REPLICA
   only:
     refs:
       - schedules
