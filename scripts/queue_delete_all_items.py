@@ -33,7 +33,7 @@ def process_prefix(handle, bucket, pfx):
 def enqueue_bucket(handle, bucket):
     digits = "0123456789abcdef"
     prefixes = [f"{kind}/{c}"
-                for kind in ["blobs", "files", "bundles", "collections"]
+                for kind in ["collections", "bundles", "files", "blobs"]
                 for c in digits]
     with ThreadPoolExecutor(10) as executor:
         executor.map(lambda pfx: process_prefix(handle, bucket, pfx), prefixes)
