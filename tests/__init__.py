@@ -9,21 +9,12 @@ import functools
 pkg_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))  # noqa
 sys.path.insert(0, pkg_root)  # noqa
 
-dss_parms = json.loads(
-    boto3.client("ssm").get_parameter(
-        Name=f"/dcp/dss/{os.environ['DDS_DEPLOYMENT_STAGE']}/environment"
-    )['Parameter']['Value']
-)
+import utils
+utils.prepare_environment()  # noqa
 
-os.environ['DSS_S3_BUCKET'] = dss_parms['DSS_S3_BUCKET']
-os.environ['DSS_GS_BUCKET'] = dss_parms['DSS_GS_BUCKET']
-os.environ['DSS_ES_ENDPOINT'] = dss_parms['DSS_ES_ENDPOINT']
-
-import dds.util  # noqa
 
 logger = logging.getLogger(__name__)
-if not os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'):
-    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = dds.util.get_gcp_credentials_file().name
+
 
 def eventually(timeout: float, interval: float, errors: set = {AssertionError}):
     """

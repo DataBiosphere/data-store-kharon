@@ -1,4 +1,5 @@
 import os
+import json
 import boto3
 import tempfile
 from functools import lru_cache
@@ -21,3 +22,17 @@ def get_gcp_credentials_file():
     tf.write(resp['SecretString'])
     tf.flush()
     return tf
+
+def prepare_environment():
+    """
+    Populate env vars stored in AWS SSM parameter store and AWS Secrets Manager.
+    """
+    dss_parms = json.loads(
+        boto3.client("ssm").get_parameter(
+            Name=f"/dcp/dss/{os.environ['DDS_DEPLOYMENT_STAGE']}/environment"
+        )['Parameter']['Value']
+    )
+    os.environ['DSS_S3_BUCKET'] = dss_parms['DSS_S3_BUCKET']
+    os.environ['DSS_GS_BUCKET'] = dss_parms['DSS_GS_BUCKET']
+    os.environ['DSS_ES_ENDPOINT'] = dss_parms['DSS_ES_ENDPOINT']
+    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = get_gcp_credentials_file().name

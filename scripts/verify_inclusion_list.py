@@ -10,10 +10,10 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 pkg_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))  # noqa
 sys.path.insert(0, pkg_root)  # noqa
 
+import utils
+utils.prepare_environment()  # noqa
 import dds
-import dds.util
 
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = dds.util.get_gcp_credentials_file().name
 missing = dict()
 failed = False
 
