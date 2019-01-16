@@ -14,8 +14,6 @@ export DDS_HOME="$(cd -P "$(dirname "$SOURCE")" && pwd)"
 
 EXPORT_ENV_VARS_TO_LAMBDA_ARRAY=(
     DDS_DEPLOYMENT_STAGE
-	DSS_S3_BUCKET
-	DSS_GS_BUCKET
 )
 
 set -a
@@ -29,21 +27,7 @@ GCP_DEFAULT_REGION=us-central1
 DDS_SECRETS_STORE="dcp/dds"
 DDS_GCP_CREDENTIALS_SECRET="gcp-credentials.json"
 
-DSS_ES_DOMAIN="dss-index-dev"
-DSS_ES_DOMAIN_INTEGRATION="dss-index-integration"
-DSS_ES_DOMAIN_STAGING="dss-index-staging"
-DSS_ES_DOMAIN_STAGING="dss-index-prod"
-
-DSS_S3_BUCKET="org-hca-dss-dev"
-DSS_S3_BUCKET_INTEGRATION="org-hca-dss-integration"
-DSS_S3_BUCKET_STAGING="org-humancellatlas-dss-staging"
-DSS_S3_BUCKET_PROD="org-hca-dss-prod"
-DSS_GS_BUCKET="org-hca-dss-dev"
-DSS_GS_BUCKET_INTEGRATION="org-hca-dss-integration"
-DSS_GS_BUCKET_STAGING="org-humancellatlas-dss-staging"
-DSS_GS_BUCKET_PROD="org-hca-dss-prod"
-
-DSS_S3_BUCKET_TEST_FIXTURES=org-hca-dss-test-fixtures
+DSS_S3_BUCKET_TEST_FIXTURES="org-hca-dss-test-fixtures"
 
 AWS_SDK_LOAD_CONFIG=1 # Needed for Terraform to correctly use AWS assumed roles
 set +a

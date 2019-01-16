@@ -26,6 +26,11 @@ before_script:
   - fi
   - scripts/fetch_secret.sh gcp-credentials.json > gcp-credentials.json
   - export GOOGLE_APPLICATION_CREDENTIALS=$(pwd -P)/gcp-credentials.json
+  - data_store_env=$(aws ssm get-parameter --name /dcp/dss/${DDS_DEPLOYMENT_STAGE}/environment | jq .Parameter.Value)
+  - data_store_env_json=$(echo $data_store_env | python -c "import sys, json; print(json.load(sys.stdin))")
+  - export DSS_S3_BUCKET=$(echo $data_store_env_json | jq -r .DSS_S3_BUCKET)
+  - export DSS_GS_BUCKET=$(echo $data_store_env_json | jq -r .DSS_GS_BUCKET)
+  - export DSS_ES_ENDPOINT=$(echo $data_store_env_json | jq -r .DSS_ES_ENDPOINT)
 
 test:
   stage: test

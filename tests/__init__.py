@@ -1,14 +1,25 @@
 import os
 import sys
 import time
+import json
+import boto3
 import logging
 import functools
 
 pkg_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))  # noqa
 sys.path.insert(0, pkg_root)  # noqa
 
-import dds.util
+dss_parms = json.loads(
+    boto3.client("ssm").get_parameter(
+        Name=f"/dcp/dss/{os.environ['DDS_DEPLOYMENT_STAGE']}/environment"
+    )['Parameter']['Value']
+)
 
+os.environ['DSS_S3_BUCKET'] = dss_parms['DSS_S3_BUCKET']
+os.environ['DSS_GS_BUCKET'] = dss_parms['DSS_GS_BUCKET']
+os.environ['DSS_ES_ENDPOINT'] = dss_parms['DSS_ES_ENDPOINT']
+
+import dds.util  # noqa
 
 logger = logging.getLogger(__name__)
 if not os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'):
