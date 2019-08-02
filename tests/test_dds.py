@@ -4,7 +4,6 @@
 import os
 import io
 import sys
-import hca
 import json
 import uuid
 import pytz
@@ -12,6 +11,7 @@ import boto3
 import random
 import unittest
 import datetime
+from hca.dss import DSSClient
 from cloud_blobstore import BlobNotFoundError
 
 pkg_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))  # noqa
@@ -32,7 +32,7 @@ class TestConfig(unittest.TestCase):
     def setUp(self):
         swag_url = f"https://dss.{stage}.data.humancellatlas.org/v1/swagger.json"
         self.ddb_client = boto3.client('dynamodb')
-        self.dss_client = hca.dss.SwaggerClient(swagger_url=swag_url)
+        self.dss_client = DSSClient(swagger_url=swag_url)
         self.handles = {
             "aws": dds.get_handle("aws"),
             "gcp": dds.get_handle("gcp"),
