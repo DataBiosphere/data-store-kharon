@@ -89,12 +89,14 @@ def deindex_bundle(key):
 def deindex_collection(key, handle, bucket):
     if key.startswith("collections/"):
         fqid = key.split("/")[1]
-        collection = json.loads(handle.get(bucket, key))
-        query = {'TableName': collection_db_table,
-                 'Key': _format_dynamodb_item(hash_key=collection['owner'],
-                                     sort_key=key, value=None)}
-        dynamodb_client.delete_item(**query)
-        logger.info(f"Removed collection {fqid} from the dynamoDB index.")
+        collection_owner = json.loads(handle.get(bucket, key)).get('owner')
+        if collection_owner:
+            query = {'TableName': collection_db_table,
+                     'Key': _format_dynamodb_item(hash_key=collection_owner,
+                                                  sort_key=key,
+                                                  value=None)}
+            dynamodb_client.delete_item(**query)
+            logger.info(f"Removed collection {fqid} from the dynamoDB index.")
 
 
 def _delete(replica, key):
