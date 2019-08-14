@@ -1,10 +1,12 @@
 # HCA Kharon: The Human Cell Atlas Data Deletion System
 
-This repository contains AWS infrastructure definitions and procedures to carry out data deletions in the Data Storage System.
+This repository contains AWS infrastructure definitions and procedures to carry out data deletions in the
+[Data Storage System](https://github.com/HumanCellAtlas/data-store).
 
 ## Installing dependencies
 
-1. Install `terraform` by following the instructions in [Install Terraform](https://www.terraform.io/intro/getting-started/install.html)
+1. Install `terraform` by following the instructions in
+[Install Terraform](https://www.terraform.io/intro/getting-started/install.html)
 
 ## Environment Variables
 
@@ -26,6 +28,14 @@ Now deploy using make:
 
     `make deploy`
 
+## Relationship to DSS (AWS SSM Parameter Store)
+
+Several configuration values need to be imported from the [data-store](https://github.com/HumanCellAtlas/data-store)
+in order for Kharon to function correctly. These values are imported during deployment from the AWS SSM Parameter
+Store `/dcp/dss/${DDS_DEPLOYMENT_STAGE}/environment`. When this parameter store is updated, Kharon should be
+redeployed.
+
 ## Tests
 
-1. Tests rely on the test fixtures bucket from the data-store repo, DSS_S3_BUCKET_TEST_FIXTURES. For instructions on populating test fixtures, see https://github.com/HumanCellAtlas/data-store/blob/master/README.md
+1. Tests rely on the test fixtures bucket from the data-store repo, DSS_S3_BUCKET_TEST_FIXTURES. For instructions on
+populating test fixtures, see https://github.com/HumanCellAtlas/data-store/blob/master/README.md

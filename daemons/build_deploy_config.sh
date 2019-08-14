@@ -22,7 +22,7 @@ cat "$config_json" | jq .manage_iam_role=false | jq .iam_role_arn=env.iam_role_a
 data_store_env=$(aws ssm get-parameter --name /dcp/dss/${DDS_DEPLOYMENT_STAGE}/environment | jq .Parameter.Value)
 data_store_env_json=$(echo $data_store_env | python -c "import sys, json; print(json.load(sys.stdin))")
 
-export DSS_ES_ENDPOINT=$(aws es describe-elasticsearch-domain --domain-name "$DSS_ES_DOMAIN" | jq -r .DomainStatus.Endpoint)
+export DSS_ES_ENDPOINT=$(aws ssm get-parameters --names "/dcp/dss/dev/environment" | jq -r '.Parameters[].Value' | jq -r '.DSS_ES_ENDPOINT')
 
 for var in $EXPORT_ENV_VARS_TO_LAMBDA DSS_ES_ENDPOINT; do
     cat "$config_json" | jq .stages.$stage.environment_variables.$var=env.$var | sponge "$config_json"
