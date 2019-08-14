@@ -52,6 +52,14 @@ data "aws_iam_policy_document" "dds_delete_policy" {
       "arn:aws:dynamodb:*:${var.account_id}:table/dds-whitelist-${var.DDS_DEPLOYMENT_STAGE}"
     ]
   }
+  statement {
+    actions = [
+      "dynamodb:DeleteItem"
+    ]
+    resources = [
+	  "arn:aws:dynamodb:*:${var.account_id}:table/dss-collections-db-${var.DDS_DEPLOYMENT_STAGE}"
+    ]
+  }
 }
 
 data "aws_iam_policy_document" "dds_delete_role_assumption" {
