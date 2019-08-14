@@ -4,6 +4,8 @@ import boto3
 import tempfile
 from functools import lru_cache
 
+from dcplib.aws.clients import sqs
+
 @lru_cache()
 def get_gcp_credentials_file():
     """
@@ -36,3 +38,6 @@ def prepare_environment():
     os.environ['DSS_GS_BUCKET'] = dss_parms['DSS_GS_BUCKET']
     os.environ['DSS_ES_ENDPOINT'] = dss_parms['DSS_ES_ENDPOINT']
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = get_gcp_credentials_file().name
+
+def get_queue_url():
+    return sqs.get_queue_url(QueueName=f"dds-delete-{os.environ['DDS_DEPLOYMENT_STAGE']}")['QueueUrl']

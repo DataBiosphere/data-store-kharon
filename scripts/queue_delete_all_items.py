@@ -5,10 +5,10 @@ Add every key in a replica to the deletion queue
 import os
 import sys
 import json
-import boto3
 import argparse
-from functools import partial
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
+
+from dcplib.aws.sqs import SQSMessenger
 
 pkg_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))  # noqa
 sys.path.insert(0, pkg_root)  # noqa
@@ -16,21 +16,12 @@ sys.path.insert(0, pkg_root)  # noqa
 import utils
 utils.prepare_environment()  # noqa
 import dds
-import queue_delete
 
 
 def process_prefix(handle, bucket, pfx):
-    sqs_client = boto3.client("sqs")
-    keys = list()
-    for key in handle.list(bucket, pfx):
-        keys.append(key)
-        if 1000 == len(keys):
-            print(f"queuing {len(keys)} for deletion")
-            queue_delete.enqueue_batch(sqs_client, keys, parallel=False)
-            keys = list()
-    if len(keys):
-        queue_delete.enqueue_batch(sqs_client, keys, parallel=False)
-
+    with SQSMessenger(utils.get_queue_url()) as sqsm:
+        for key in handle.list(bucket, pfx):
+            sqsm.send(json.dumps(dict(key=key)))
 
 def enqueue_bucket(handle, bucket):
     digits = "0123456789abcdef"
@@ -39,7 +30,6 @@ def enqueue_bucket(handle, bucket):
                 for c in digits]
     with ThreadPoolExecutor(10) as executor:
         executor.map(lambda pfx: process_prefix(handle, bucket, pfx), prefixes)
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
