@@ -59,7 +59,7 @@ data "aws_iam_policy_document" "dds_delete_role_assumption" {
     actions = [
       "sts:AssumeRole"
     ]
-    principals = {
+    principals {
       type        = "Service"
       identifiers = ["lambda.amazonaws.com"]
     }

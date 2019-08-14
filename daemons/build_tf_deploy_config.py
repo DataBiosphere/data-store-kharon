@@ -23,6 +23,12 @@ env_vars_to_lambda = os.environ['EXPORT_ENV_VARS_TO_LAMBDA'].split()
 stage=os.environ['DDS_DEPLOYMENT_STAGE']
 
 
+terraform_variable_template = """
+variable "{name}" {{
+  default = "{val}"
+}}
+"""
+
 terraform_backend_template = """# Auto-generated
 # Please edit daemons/build_tf_deploy_config.py
 terraform {{
@@ -49,15 +55,17 @@ provider google {{
 account_id = boto3.client("sts").get_caller_identity()['Account']
 backend_bucket = os.environ['DDS_TERRAFORM_BACKEND_BUCKET_TEMPLATE'].format(account_id=account_id)
 
-terraform_variable_info = {'variable': {'account_id': {'default': account_id}}}
+terraform_variables = [("account_id", account_id)]
 for key in env_vars_to_lambda:
-    terraform_variable_info['variable'][key] = {
-        'default': os.environ[key]
-    }
+    terraform_variables.append((key, os.environ[key]))
+
 parm = boto3.client("ssm").get_parameter(Name=f"/dcp/dss/{stage}/environment")
 dss_lambda_env_vars = json.loads(parm['Parameter']['Value'])
 for key, val in dss_lambda_env_vars.items():
-    terraform_variable_info['variable'][key] = dict(default=val)
+    if '"' in val:
+        print(f"WARNING: unable to import {key} {val} into terraform variable")
+    else:
+        terraform_variables.append((key, val))
 
 with open(os.path.join(daemons_root, args.daemon, "backend.tf"), "w") as fp:
     if os.environ.get('AWS_PROFILE'):
@@ -74,7 +82,8 @@ with open(os.path.join(daemons_root, args.daemon, "backend.tf"), "w") as fp:
     ))
 
 with open(os.path.join(daemons_root, args.daemon, "variables.tf"), "w") as fp:
-    fp.write(json.dumps(terraform_variable_info, indent=2))
+    for name, val in terraform_variables:
+        fp.write(terraform_variable_template.format(name=name, val=val))
 
 with open(os.path.join(daemons_root, args.daemon, "providers.tf"), "w") as fp:
     fp.write(terraform_providers_template.format(
