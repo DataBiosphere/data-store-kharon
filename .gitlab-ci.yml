@@ -9,17 +9,13 @@ stages:
   - delete
 
 before_script:
-  - export COMMITS_URL=${GITHUB_API}/repos/HumanCellAtlas/kharon/commits
-  - if not [[ CI_COMMIT_SHA == $(http GET $COMMITS_URL sha==$CI_COMMIT_REF_NAME | jq -r '.[0]["sha"]') ]]; then exit 1; fi
+  - echo "branch name - ${CI_COMMIT_REF_NAME}"
   - virtualenv ~/venv
   - source ~/venv/bin/activate
   - pip install -r requirements.txt
   - source environment
-  - if [[ master == $CI_COMMIT_REF_NAME ]]; then
-  -   DDS_ENV="dev"
-  - elif [[ -f "environment.$CI_COMMIT_REF_NAME" ]]; then
-  -   DDS_ENV=$CI_COMMIT_REF_NAME
-  -   source environment.$DDS_ENV
+  - if [[ -f "environment.$CI_COMMIT_REF_NAME" ]]; then
+  -   source environment.$CI_COMMIT_REF_NAME
   - fi
   - scripts/fetch_secret.sh gcp-credentials.json > gcp-credentials.json
   - export GOOGLE_APPLICATION_CREDENTIALS=$(pwd -P)/gcp-credentials.json

@@ -8,7 +8,7 @@ if [[ $# != 1 ]]; then
 fi
 
 if [[ -z $DDS_DEPLOYMENT_STAGE ]]; then
-    echo 'Please run "source environment" in the data-store repo root directory before running this command'
+    echo 'Please run "source environment" in the kharon repo root directory before running this command'
     exit 1
 fi
 

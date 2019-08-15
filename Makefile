@@ -32,6 +32,14 @@ plan-infra:
 infra:
 	$(MAKE) -C infra apply-all
 
+delete-inclusion-list:
+	$(MAKE) -C infra COMPONENT=whitelist destroy
+
+make-inclusion-list:
+	$(MAKE) -C infra COMPONENT=whitelist apply
+
+clear-inclusion-list: delete-inclusion-list make-inclusion-list
+
 refresh_all_requirements:
 	@echo -n '' >| requirements.txt
 	@if [ $$(uname -s) == "Darwin" ]; then sleep 1; fi  # this is require because Darwin HFS+ only has second-resolution for timestamps.
