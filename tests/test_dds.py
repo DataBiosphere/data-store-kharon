@@ -79,8 +79,7 @@ class TestConfig(unittest.TestCase):
 
                 # Add key to whitelist
                 self._put_whitelist_item(key)
-                dds.get_whitelist.cache_clear()
-                self.assertIn(key, dds.get_whitelist())
+                self.assertTrue(dds.key_in_inclusion_list(key))
 
                 # Should not be able to delete whitelsited key
                 dds.delete(key)
@@ -88,8 +87,7 @@ class TestConfig(unittest.TestCase):
 
                 # Remove key from whitelist
                 self._delete_whitelist_item(key)
-                dds.get_whitelist.cache_clear()
-                self.assertNotIn(key, dds.get_whitelist())
+                self.assertFalse(dds.key_in_inclusion_list(key))
 
                 # Should be able to delete key
                 dds.delete(key)

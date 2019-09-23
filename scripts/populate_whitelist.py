@@ -65,9 +65,6 @@ def find_references(handle, bucket, key):
 
 
 def populate_whitelist(keys):
-    current_whitelist = dds.get_whitelist()
-    deletes = set(current_whitelist).difference_update(keys)
-
     chunks = list()
     while(len(keys)):
         chunks.append(keys[:25])

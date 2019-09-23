@@ -70,9 +70,24 @@ def get_handle(replica):
 @functools.lru_cache()
 def get_whitelist():
     ddb_client = boto3.client('dynamodb')
-    items = ddb_client.scan(TableName=f"dds-whitelist-{os.environ['DDS_DEPLOYMENT_STAGE']}")['Items']
-    keys = {item['key']['S'] for item in items}
-    return keys
+    pageinator = ddb_client.get_paginator('scan')
+    for page in pageinator.paginate(TableName=f"dds-whitelist-{os.environ['DDS_DEPLOYMENT_STAGE']}"):
+        for item in page['Items']:
+            yield item['key']['S']
+
+
+def key_in_inclusion_list(key: str):
+    ddb_client = boto3.client("dynamodb")
+    table = f"dds-whitelist-{os.environ['DDS_DEPLOYMENT_STAGE']}"
+    lookup = {"key": {"S": key}}
+    resp = ddb_client.get_item(TableName=table, Key=lookup)
+    if 'Item' in resp.keys():
+        assert key == resp['Item']['key']['S']
+        logger.info(f"Found {key} in whitelist")
+        return True
+    else:
+        logger.info(f"{key} was not found in whitelist")
+        return False
 
 
 def deindex_bundle(key):
@@ -113,7 +128,7 @@ def _delete(replica, key):
 
 
 def delete(key):
-    if key in get_whitelist():
+    if key_in_inclusion_list(key):
         logger.debug(f"Not deleting whitelisted {key}")
     else:
         for replica in BUCKETS:
