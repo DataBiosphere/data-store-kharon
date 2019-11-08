@@ -39,3 +39,17 @@ redeployed.
 
 1. Tests rely on the test fixtures bucket from the data-store repo, DSS_S3_BUCKET_TEST_FIXTURES. For instructions on
 populating test fixtures, see https://github.com/HumanCellAtlas/data-store/blob/master/README.md
+
+## Inclusion List Population
+
+Writing very large inclusion lists to the dynamodb table can error unexpectedly, its best to break down large
+whitelists into smaller segments, then upload each segment. The follow make commands can help:
+```
+# ${staging_dir} can be a new directory, it will be created as needed
+make create-inclusion-list-parts INCLUSIONLIST=${inclusion_list} DIR=${staging_dir}
+while true; do make populate-inclusion-list-parts DIR=${staging_dir} && break; done
+```
+
+These commands will split the large whitelist into smaller segments, then attempt to upload each whitelist to the 
+dynamodb table. As the make command runs it will move completed segments into `${staging_dir}/complete/`, if the make
+command errors, it will rerun until it completes successfully. 

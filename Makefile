@@ -1,3 +1,4 @@
+FILES=${shell find $(DIR)/* -type f -not -path "*complete*" -exec basename {} \; }
 include common.mk
 MODULES=tests
 
@@ -39,6 +40,18 @@ make-inclusion-list:
 	$(MAKE) -C infra COMPONENT=whitelist apply
 
 clear-inclusion-list: delete-inclusion-list make-inclusion-list
+
+populate-inclusion-list-parts:
+	${shell mkdir -p $(DIR)/complete}
+	@for f in $(FILES); do \
+		echo "processing $$f" ; \
+		python ${DDS_HOME}/scripts/populate_whitelist.py $(DIR)/$$f || [ "$$?" --eq 0 ] &&  \
+		mv $(DIR)/$$f $(DIR)/complete/$$f || exit 1 ; \
+	done
+
+create-inclusion-list-parts:
+	mkdir -p $(DIR)
+	split -a 10 -l 20 $(INCLUSIONLIST) $(DIR)/
 
 refresh_all_requirements:
 	@echo -n '' >| requirements.txt
