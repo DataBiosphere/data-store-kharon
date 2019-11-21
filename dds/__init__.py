@@ -83,7 +83,7 @@ def key_in_inclusion_list(key: str):
     resp = ddb_client.get_item(TableName=table, Key=lookup)
     if 'Item' in resp.keys():
         assert key == resp['Item']['key']['S']
-        logger.info(f"Found {key} in whitelist")
+        logger.warning(f"Found {key} in whitelist")
         return True
     else:
         logger.info(f"{key} was not found in whitelist")
