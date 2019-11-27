@@ -7,8 +7,9 @@ Welcome to Kharon's documentation!
 ==================================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :titlesonly:
+   :maxdepth: 1
+   :numbered:
 
    intro
    deletion
