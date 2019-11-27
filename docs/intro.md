@@ -8,13 +8,30 @@ of the [Human Cell Atlas (HCA)](https://github.com/HumanCellAtlas) project.
 To cover how Kharon works, we first provide an explanation of how deletion of data is handled by the DSS. This is
 dictated by a [deletion RFC](https://github.com/HumanCellAtlas/dcp-community/blob/master/rfcs/text/0004-dss-deletion-process.md)
 in the [dcp-community repository](https://github.com/HumanCellAtlas/dcp-community) and was driven by the
-requirements of the broader HCA. We cover this on the [deletion](deletion.md) page.
+requirements of the broader HCA.
 
-Kharon utilizes several cloud components. We give an overview of the cloud architecture of Kharon and how data
-flows through it on the [arch](arch.md) page.
+**Go to the [Deletion](deletion.md) page**
 
-We cover the installation of Kharon and its dependent software components on the [install](install.md) page.
+Kharon is architected to scale up and handle massive file deletion events. We explain Kharon's cloud
+architecture and design and how data flows through it.
 
-We cover the deployment of Kharon to the cloud on the [deploy](deploy.md) page.
+**Go to the [Architecture](arch.md) page**
 
-Finally, we cover our test strategy for Kharon on the [test](test.md) page.
+Kharon depends on several pieces of software. We cover how to install Kharon and its dependencies.
+
+**Go to the [Installing Kharon](install.md) page**
+
+Kharon utilizes multiple cloud components, which must be built, configured, and deployed to the cloud.
+We cover how to deploy Kharon resources to the cloud.
+
+**Go to the [Deploying Kharon](deploy.md) page**
+
+Now that Kharon's internals have been covered, we move on to performing common operations with Kharon.
+
+**Go to the [Runbook](runbook.md) page**
+
+Finally, Kharon performs sensitive operations and must be rigorously tested. In addition, continuous
+integration (CI) is used to schedule test builds and facilitate maintenance operations (including both
+scheduled operations and manual operations).
+
+**Go to the [Testing](tests.md) page**
