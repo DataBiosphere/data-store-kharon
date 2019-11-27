@@ -1,7 +1,7 @@
 Deletion in the HCA
 ---------------------
 
-## Definitions
+### Definitions
 
 **Blob**: The fundamental unit of data in the data store.
 
@@ -24,7 +24,7 @@ users through the API.
 **Tombstone**: A marker used to indicate that a particular version of data has been logically deleted and superseded
 by a newer version.
 
-## DSS Data Model
+### DSS Data Model
 
 Before we discuss deletion of data, we provide a summary of the data model used in the data store.
 
@@ -43,7 +43,7 @@ Users can delete (or restore) either files or bundles using the data store API.
 
 Users and operators may perform either physical or logical deletions of files or bundles using the data store API.
 
-## Deletion RFC
+### Deletion RFC
 
 The decision of whether to perform a logical deletion or a physical deletion should be decided using the
 [deletion RFC](https://github.com/HumanCellAtlas/dcp-community/blob/master/rfcs/text/0004-dss-deletion-process.md)
@@ -53,7 +53,7 @@ Users and operators requesting the deletion of files or bundles use the API and 
 request the deletion (which returns information about the data to be deleted), and one call to confirm deletion.
 Here we cover what happens once the data store receives the confirmed deletion requests.
 
-### Logical Deletion
+#### Logical Deletion
 
 For logical deletion of files, the individual file is replaced with a tombstone marker, and future attempts to
 access that version of that file will return a 410 error. 
@@ -67,7 +67,7 @@ requests to access any version of that resource will return a 410 error.
 (Note: tombstoned files are not technically considered logically deleted, since someone with a direct link to the
 underlying blob in the data store can still access the data that was in the file.)
 
-### Physical Deletion
+#### Physical Deletion
 
 For physical deletion of files, the individual file is replaced with a tombstone marker (like with logical
 deletion). However, the file is also added to the deletion queue, which will schedule it for permanent deletion
