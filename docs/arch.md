@@ -13,7 +13,7 @@ process the items.
 Here is the Domovoi app code that is triggered by SQS queue events:
 [`daemons/dds-delete/app.py`](https://github.com/HumanCellAtlas/kharon/blob/master/daemons/dds-delete/app.py)
 
-```
+```text
 @app.sqs_queue_subscriber("dds-delete-" + os.environ["DDS_DEPLOYMENT_STAGE"])
 def launch_from_queue(event, context):
     for event_record in event["Records"]:
@@ -32,7 +32,7 @@ functions.
 Here is the Kharon delete method, called by the lambda swarm on each queue item:
 [`dds/__init__.py`](https://github.com/HumanCellAtlas/kharon/blob/master/dds/__init__.py)
 
-```
+```text
 def delete(key):
     if key_in_inclusion_list(key):
         logger.debug(f"Not deleting whitelisted {key}")
@@ -61,7 +61,7 @@ Note: it is good practice to include the stage name in the deletion list filenam
 
 Example:
 
-```
+```text
 $ cat deletion_list.dev.txt
 bundles/d8f7f78d-1c77-49cc-b934-28d0da11c6d0.2019-08-14T102354.922428Z
 files/d75b202a-3697-41f4-a3ab-8fdfe32dc2cc.2019-08-12T132717.497000Z
@@ -73,7 +73,7 @@ $ python scripts/queue_delete.py deletion_list.dev.txt
 
 Alternatively, specific file, bundle, or blob identifiers can be passed to the script:
 
-```
+```text
 $ python queue_delete.py bundles/c6bf5219-92ac-4ffb-88a3-0b8df3a70125.2019-11-22T005022.190038Z
 ```
 
@@ -99,7 +99,7 @@ Note: it is good practice to include the stage name in the inclusion list filena
 
 Example:
 
-```
+```text
 $ cat inclusion_list.dev.txt
 bundles/b1d7cbc3-179d-44e1-8c6f-cbdb44f94ac9.2019-11-20T220640.158388Z
 bundles/4b735dfa-7a2d-4d08-930c-8dbce0810dba.2019-11-20T220107.998749Z

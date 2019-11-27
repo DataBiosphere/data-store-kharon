@@ -7,23 +7,15 @@ Welcome to Kharon's documentation!
 ==================================
 
 .. toctree::
-   :titlesonly:
    :maxdepth: 1
    :numbered:
 
-   intro
    deletion
    arch
    install
    deploy
-   test
+   runbook
+   tests
 
+.. mdinclude:: intro.md
 
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
