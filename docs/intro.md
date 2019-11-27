@@ -1,8 +1,6 @@
 Introduction to Kharon
 ------------------------
 
-## Introduction to Kharon
-
 Kharon is a tool for deleting data in the [Data Storage System (DSS)](https://github.com/HumanCellAtlas/data-store),
 a component in the [Data Coordination Platform (DCP)](https://github.com/HumanCellAtlas/dcp-community)
 of the [Human Cell Atlas (HCA)](https://github.com/HumanCellAtlas) project.
