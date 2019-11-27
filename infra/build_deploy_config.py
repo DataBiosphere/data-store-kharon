@@ -49,6 +49,9 @@ env_vars_to_infra = [
     "AWS_DEFAULT_REGION",
     "DDS_DEPLOYMENT_STAGE",
     "DDS_GCP_SERVICE_ACCOUNT_NAME",
+    "DDS_INFRA_TAG_OWNER",
+    "DDS_INFRA_TAG_PROJECT",
+    "DDS_INFRA_TAG_SERVICE",
 ]
 
 with open(os.path.join(infra_root, args.component, "backend.tf"), "w") as fp:

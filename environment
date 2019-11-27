@@ -27,6 +27,10 @@ GCP_DEFAULT_REGION=us-central1
 DDS_SECRETS_STORE="dcp/dds"
 DDS_GCP_CREDENTIALS_SECRET="gcp-credentials.json"
 
+DDS_INFRA_TAG_PROJECT=dcp
+DDS_INFRA_TAG_SERVICE=dss
+DDS_INFRA_TAG_OWNER=dss-team@data.humancellatlas.org
+
 DSS_S3_BUCKET_TEST_FIXTURES="org-hca-dss-test-fixtures"
 
 AWS_SDK_LOAD_CONFIG=1 # Needed for Terraform to correctly use AWS assumed roles
