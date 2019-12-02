@@ -20,6 +20,11 @@ config_json="$(dirname $0)/${daemon_name}/.chalice/config.json"
 export iam_role_arn=$(cd $daemon_name ; terraform output role-arn)
 cat "$config_json" | jq .manage_iam_role=false | jq .iam_role_arn=env.iam_role_arn | sponge "$config_json"
 
+
+export layer_name=dds-dependencies-${stage}
+export layer_version_arn=$(aws lambda list-layers | jq -r '.Layers[] | select(.LayerName == env.layer_name) | .LatestMatchingVersion.LayerVersionArn')
+cat "$config_json" | jq ".stages.$stage.layers=[env.layer_version_arn]" | sponge "$config_json"
+
 data_store_env=$(aws ssm get-parameter --name /dcp/dss/${DDS_DEPLOYMENT_STAGE}/environment | jq -r .Parameter.Value | jq .)
 export DSS_ES_ENDPOINT=$(echo $data_store_env | jq -r .DSS_ES_ENDPOINT)
 

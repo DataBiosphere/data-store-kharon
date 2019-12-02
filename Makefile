@@ -69,7 +69,13 @@ requirements.txt: %.txt : %.txt.in
 	rm -rf .$<-env
 #	scripts/find_missing_wheels.py requirements.txt # Disabled by akislyuk (circular dependency issues)
 
+generate-dependencies:
+	scripts/generate_upload_requirements_layer.sh
+
 clean:
 	git clean -Xdf daemons $(MODULES)
+	rm -rf dependencies
+	rm -rf temp_domovoi
+	rm -rf dds-dependencies-${DSS_DEPLOYMENT_STAGE}.zip
 
 .PHONY: all lint mypy test deploy deploy-daemons infra refresh_all_requirements, requirements.txt

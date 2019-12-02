@@ -5,7 +5,10 @@ AWS_DAEMONS := \
 
 deploy: $(AWS_DAEMONS)
 
-$(AWS_DAEMONS):
+generate-dependencies:
+	${DDS_HOME}/scripts/generate_upload_requirements_layer.sh
+
+$(AWS_DAEMONS): generate-dependencies
 	./terraform_daemon.sh $@
 	./package_daemon.sh $@
 	./build_deploy_config.sh $@
