@@ -10,8 +10,8 @@ next deletion event is scheduled (approximately daily). When the scheduled delet
 processes each item in the queue and creates an event from each item. Those items then trigger lambda functions to
 process the items.
 
-Here is the Domovoi app code that is triggered by SQS queue events:
-[`daemons/dds-delete/app.py`](https://github.com/HumanCellAtlas/kharon/blob/master/daemons/dds-delete/app.py)
+The Domovoi app code that is triggered by SQS queue events is in `daemons/dss-delete/app.py`
+[(link)](https://github.com/HumanCellAtlas/kharon/blob/master/daemons/dds-delete/app.py).
 
 ```text
 @app.sqs_queue_subscriber("dds-delete-" + os.environ["DDS_DEPLOYMENT_STAGE"])
@@ -29,8 +29,8 @@ This architecture of populating a queue with items, and removing each item(s) fr
 lambda function to process the item - enables a massive scale-up of deletion events using a swarm of lambda
 functions.
 
-Here is the Kharon delete method, called by the lambda swarm on each queue item:
-[`dds/__init__.py`](https://github.com/HumanCellAtlas/kharon/blob/master/dds/__init__.py)
+The Kharon delete method, called by the lambda swarm on each queue item, is in `dds/__init__.py`
+[(link)](https://github.com/HumanCellAtlas/kharon/blob/master/dds/__init__.py).
 
 ```text
 def delete(key):
@@ -54,7 +54,7 @@ files, bundles, or blobs to mark for physical deletion. No "master" deletion lis
 the deletion queue itself can be thought of as the "master" deletion list.
 
 To delete specific items, a deletion list should be assembled in a text file. An operator can then use the script
-[`scripts/queue_delete.py`](https://github.com/HumanCellAtlas/kharon/blob/master/scripts/queue_delete.py) and pass
+at `scripts/queue_delete.py` [(link)](https://github.com/HumanCellAtlas/kharon/blob/master/scripts/queue_delete.py) and pass
 the file containing the deletion list.
 
 Note: it is good practice to include the stage name in the deletion list filename.
@@ -90,8 +90,8 @@ exit without touching the file. This architecture (using a highly scalable datab
 allows the lambda swarm to scale without creating a bottleneck with the inclusion list lookup step.
 
 To save specific items from being deleted, an inclusion list should be assembled in a text file. An operator can
-then use the script
-[`scripts/populate_whitelist.py`](https://github.com/HumanCellAtlas/kharon/blob/master/scripts/populate_whitelist.py)
+then use the script at `scripts/populate_whitelist.py`
+[(link)](https://github.com/HumanCellAtlas/kharon/blob/master/scripts/populate_whitelist.py)
 and pass the file containing the inclusion list, and each item in the inclusion list file will be added to the
 DynamoDB inclusion list.
 

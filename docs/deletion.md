@@ -37,6 +37,8 @@ Two files that have different names but the exact same content will point to the
 Each bundle in the data store is a pointer to a file or group of files. It is valid for multiple bundles to share
 the same file.
 
+![DSS Data Model](img/bundles_files_blobs.png)
+
 **TODO @chmreid: is metadata stored at the file level, or at the bundle level, or...?**
 
 Users can delete (or restore) either files or bundles using the data store API.
