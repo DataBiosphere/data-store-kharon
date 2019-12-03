@@ -59,7 +59,7 @@ refresh_all_requirements:
 	@touch requirements.txt.in
 	@$(MAKE) requirements.txt
 
-requirements.txt: %.txt : %.txt.in
+requirements.txt requirements-docs.txt: %.txt : %.txt.in
 	[ ! -e .requirements-env ] || exit 1
 	virtualenv -p $(shell which python3) .$<-env
 	.$<-env/bin/pip install -r $@
