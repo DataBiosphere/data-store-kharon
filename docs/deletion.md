@@ -28,6 +28,8 @@ by a newer version.
 
 Before we discuss deletion of data, we provide a summary of the data model used in the data store.
 
+![Data store data model - bundle, file, and blob relationships](img/bundles_files_blobs.png)
+
 The fundamental unit of data in the data store is a blob. There is nearly always a one-to-one correspondence
 between files and blobs (except in the case of very large files uploaded in multiple parts).
 
@@ -37,13 +39,10 @@ Two files that have different names but the exact same content will point to the
 Each bundle in the data store is a pointer to a file or group of files. It is valid for multiple bundles to share
 the same file.
 
-![DSS Data Model](img/bundles_files_blobs.png)
+Users can delete or restore files and bundles using the data store API (with appropriate permissions).
 
-**TODO @chmreid: is metadata stored at the file level, or at the bundle level, or...?**
-
-Users can delete (or restore) either files or bundles using the data store API.
-
-Users and operators may perform either physical or logical deletions of files or bundles using the data store API.
+Users and operators may perform deletion (logical or physical) of files and bundles using the data store API
+(with appropriate permissions).
 
 ### Deletion RFC
 
@@ -79,5 +78,10 @@ For physical deletion of bundles, the individual bundle is replaced with a tombs
 deletion queue. _Additionally,_ however, each file in that bundle is also tombstoned and added to the deletion
 queue. 
 
+**TODO: add info about what happens to non-deleted bundles that refer to physically deleted files (@chmreid)**
+
 Once a file or bundle is physically deleted, direct links to the data will become invalid.
 
+### GDPR
+
+**TODO: include GDPR procedure (@chmreid)**
