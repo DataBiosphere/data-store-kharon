@@ -64,18 +64,19 @@ def find_references(handle, bucket, key):
     return references
 
 
-def populate_whitelist(keys):
+def populate_whitelist(keys, action):
     chunks = list()
     while(len(keys)):
         chunks.append(keys[:25])
         keys = keys[25:]
 
+    attribute_lookup = "Key" if action == "DeleteRequest" else "Item"
     for chunk in chunks:
         request_items = {
             f"dds-whitelist-{os.environ['DDS_DEPLOYMENT_STAGE']}": [
                 {
-                    'PutRequest': {
-                        'Item': {
+                    action : {
+                        attribute_lookup : {
                             'key': {
                                 'S': key
                             }
@@ -92,6 +93,7 @@ def populate_whitelist(keys):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("keys_file", help="File containing list of items with format {type}/{uuid}.{version}. One item per line.")
+    parser.add_argument("--delete", help="removes items from the whitelist rather than inserting them", action="store_true")
     args = parser.parse_args()
 
     with open(args.keys_file, "r") as fh:
@@ -105,4 +107,5 @@ if __name__ == "__main__":
         results = [f.result() for f in as_completed(futures)]
         whitelist = whitelist.union(*results)
 
-    populate_whitelist(list(whitelist))
+    action = "DeleteRequest" if args.delete else "PutRequest"
+    populate_whitelist(list(whitelist), action=action)
