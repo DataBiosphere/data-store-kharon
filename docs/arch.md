@@ -117,7 +117,7 @@ $ python scripts/queue_delete.py deletion_list.dev.txt
 Alternatively, specific file, bundle, or blob identifiers can be passed to the script:
 
 ```text
-$ python queue_delete.py bundles/c6bf5219-92ac-4ffb-88a3-0b8df3a70125.2019-11-22T005022.190038Z
+$ python scripts/queue_delete.py bundles/c6bf5219-92ac-4ffb-88a3-0b8df3a70125.2019-11-22T005022.190038Z
 ```
 
 ### Carry-Over Inclusion Lists
