@@ -12,8 +12,7 @@ Deletion in the HCA
 **Deletion queue**: A queue of items in the data store that should be physically deleted. This queue is processed
 on a regular, scheduled basis.
 
-**File**: A pointer to a blob (or multiple blobs, if the file was uploaded in multiple parts). Two files may point
-to the same blob if their contents are identical.
+**File**: A pointer to a blob. Two files may point to the same blob if their contents are identical.
 
 **Logical delete**: The process of "soft" deletion of data. Occurs by replacing the latest version of the data with
 a new version. The previous version is hidden behind a deletion marker (a.k.a. a "tombstone") and is unavailable to
@@ -30,11 +29,11 @@ Before we discuss deletion of data, we provide a summary of the data model used 
 
 ![Data store data model - bundle, file, and blob relationships](img/bundles_files_blobs.png)
 
-The fundamental unit of data in the data store is a blob. There is nearly always a one-to-one correspondence
-between files and blobs (except in the case of very large files uploaded in multiple parts).
+The fundamental unit of data in the data store is a blob. There is always a one-to-one correspondence between files
+and blobs.
 
-Each file in the data store is a pointer to a blob (or multiple blobs, for very large files) in the data store.
-Two files that have different names but the exact same content will point to the same blob.
+Each file in the data store is a pointer to a blob in the data store.  Two files that have different names but the
+exact same content will point to the same blob.
 
 Each bundle in the data store is a pointer to a file or group of files. It is valid for multiple bundles to share
 the same file.
