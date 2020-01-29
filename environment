@@ -1,9 +1,9 @@
-# HCA DDS environment variables
+# DDS environment variables
 #
 # Source this file in your bash shell using "source environment".
 #
 # The environment variables set in this file are appropriate for the
-# HCA DDS development environment. Individual environment variable
+# DDS development environment. Individual environment variable
 # values are overridden when deployed, based on the deployment stage.
 # That logic resides in {chalice,daemons}/build_deploy_config.sh.
 

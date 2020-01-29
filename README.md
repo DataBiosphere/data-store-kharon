@@ -1,7 +1,7 @@
-# HCA Kharon: The Human Cell Atlas Data Deletion System
+# Kharon: The Data Store Deletion System
 
 This repository contains AWS infrastructure definitions and procedures to carry out data deletions in the
-[Data Storage System](https://github.com/HumanCellAtlas/data-store).
+[Data Storage System (DSS)](https://github.com/DataBiosphere/data-store).
 
 ## Installing dependencies
 
@@ -26,24 +26,25 @@ Run `source environment` now and whenever these environment files are modified.
 
 Now deploy using make:
 
-    `make deploy`
+    make deploy
 
 ## Relationship to DSS (AWS SSM Parameter Store)
 
-Several configuration values need to be imported from the [data-store](https://github.com/HumanCellAtlas/data-store)
+Several configuration values need to be imported from the [data-store](https://github.com/DataBiosphere/data-store)
 in order for Kharon to function correctly. These values are imported during deployment from the AWS SSM Parameter
-Store `/dcp/dss/${DDS_DEPLOYMENT_STAGE}/environment`. When this parameter store is updated, Kharon should be
+Store `${DDS_SECRETS_STORE}/${DDS_DEPLOYMENT_STAGE}/environment`. When this parameter store is updated, Kharon should be
 redeployed.
 
 ## Tests
 
-1. Tests rely on the test fixtures bucket from the data-store repo, DSS_S3_BUCKET_TEST_FIXTURES. For instructions on
-populating test fixtures, see https://github.com/HumanCellAtlas/data-store/blob/master/README.md
+1. Tests rely on the test fixtures bucket from the data-store repo, `DSS_S3_BUCKET_TEST_FIXTURES`. For instructions on
+populating test fixtures, see https://github.com/DataBiosphere/data-store/blob/master/README.md
 
 ## Inclusion List Population
 
 Writing very large inclusion lists to the dynamodb table can error unexpectedly, its best to break down large
 whitelists into smaller segments, then upload each segment. The follow make commands can help:
+
 ```
 # ${staging_dir} can be a new directory, it will be created as needed
 make create-inclusion-list-parts INCLUSIONLIST=${inclusion_list} DIR=${staging_dir}
