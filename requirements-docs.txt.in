@@ -1,0 +1,3 @@
+# Be sure to run "make requirements-docs.txt" after editing this file.
+Sphinx>=2.2.2
+m2r>=0.2.1
