@@ -13,7 +13,7 @@ creates an event from each item. Those items then trigger lambda functions to pr
 ![Architecture diagram - deletion queue and domovoi app](img/arch_domovoi.png)
 
 The Domovoi app code that is triggered by SQS queue events is in `daemons/dds-delete/app.py`
-[(link)](https://github.com/HumanCellAtlas/kharon/blob/master/daemons/dds-delete/app.py).
+[(link to dss-delete app)](https://github.com/DataBiosphere/data-store-kharon/blob/master/daemons/dds-delete/app.py).
 
 ```text
 @app.sqs_queue_subscriber("dds-delete-" + os.environ["DDS_DEPLOYMENT_STAGE"])
@@ -32,7 +32,7 @@ lambda function to process the item, enables a massive scale-up of deletion even
 functions.
 
 The Kharon delete method, called by the lambda swarm on each queue item, is in `dds/__init__.py`
-[(link)](https://github.com/HumanCellAtlas/kharon/blob/master/dds/__init__.py).
+[(link to dds init)](https://github.com/DataBiosphere/data-store-kharon/blob/master/dds/__init__.py).
 
 ```text
 def delete(key):
@@ -73,7 +73,7 @@ allows the lambda swarm to scale without creating a bottleneck with the inclusio
 
 To save specific items from being deleted, an inclusion list should be assembled in a text file. An operator can
 then use the script at `scripts/populate_whitelist.py`
-[(link)](https://github.com/HumanCellAtlas/kharon/blob/master/scripts/populate_whitelist.py)
+[(link to populate whitelist script)](https://github.com/DataBiosphere/data-store-kharon/blob/master/scripts/populate_whitelist.py)
 and pass the file containing the inclusion list, and each item in the inclusion list file will be added to the
 DynamoDB inclusion list.
 
@@ -97,7 +97,7 @@ files, bundles, or blobs to mark for physical deletion. No "master" deletion lis
 the deletion queue itself can be thought of as the "master" deletion list.
 
 To delete specific items, a deletion list should be assembled in a text file. An operator can then use the script
-at `scripts/queue_delete.py` [(link)](https://github.com/HumanCellAtlas/kharon/blob/master/scripts/queue_delete.py) and pass
+at `scripts/queue_delete.py` [(link to queue delete script)](https://github.com/DataBiosphere/data-store-kharon/blob/master/scripts/queue_delete.py) and pass
 the file containing the deletion list.
 
 Note: it is good practice to include the stage name in the deletion list filename.
@@ -132,3 +132,4 @@ list, and makes it easier to control changes in the inclusion list (e.g., versio
 Cleanup operations performed for a given stage will delete all files on that stage except those on the inclusion
 list. Cleanup operations do not use deletion lists - they add every file and bundle in the stage to the deletion
 queue, and delete any files or bundles that are not on the inclusion list.
+
