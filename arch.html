@@ -1,0 +1,221 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>2. Kharon Cloud Architecture &#8212; Kharon  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="3. Installing Kharon" href="install.html" />
+    <link rel="prev" title="1. Deletion in the HCA" href="deletion.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="kharon-cloud-architecture">
+<h1>2. Kharon Cloud Architecture<a class="headerlink" href="#kharon-cloud-architecture" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="deletion-queue">
+<h2>2.1. Deletion Queue<a class="headerlink" href="#deletion-queue" title="Permalink to this headline">¶</a></h2>
+<p>The central idea behind Kharon is the deletion queue.</p>
+<p>When items are marked for physical deletion, they are added to the queue. The queue will accumulate items until the
+next deletion event is scheduled (approximately daily) or the deletion event is manually triggered via Kharon’s
+CI/CD system. When the scheduled deletion event occurs, the AWS SQS queue processes each item in the queue and
+creates an event from each item. Those items then trigger lambda functions to process the items.</p>
+<a class="reference external image-reference" href="img/arch_domovoi.png"><img alt="Architecture diagram - deletion queue and domovoi app" src="_images/arch_domovoi.png" /></a>
+<p>The Domovoi app code that is triggered by SQS queue events is in <code class="docutils literal notranslate"><span class="pre">daemons/dds-delete/app.py</span></code>
+<a class="reference external" href="https://github.com/HumanCellAtlas/kharon/blob/master/daemons/dds-delete/app.py">(link)</a>.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>@app.sqs_queue_subscriber(&quot;dds-delete-&quot; + os.environ[&quot;DDS_DEPLOYMENT_STAGE&quot;])
+def launch_from_queue(event, context):
+    for event_record in event[&quot;Records&quot;]:
+        message = json.loads(event_record[&quot;body&quot;])
+        dds.delete(message[&#39;key&#39;])
+</pre></div>
+</div>
+<p>Each SQS event spawns a lambda function (specifically, a domovoi app) whose job is to delete the queue item(s)
+passed to it. The <code class="docutils literal notranslate"><span class="pre">dds.delete()</span></code> call also handles checking the list of files that should not be deleted (see
+below).</p>
+<p>This architecture of populating a queue with items, and removing each item(s) from the queue and triggering a
+lambda function to process the item, enables a massive scale-up of deletion events using a swarm of lambda
+functions.</p>
+<p>The Kharon delete method, called by the lambda swarm on each queue item, is in <code class="docutils literal notranslate"><span class="pre">dds/__init__.py</span></code>
+<a class="reference external" href="https://github.com/HumanCellAtlas/kharon/blob/master/dds/__init__.py">(link)</a>.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>def delete(key):
+    if key_in_inclusion_list(key):
+        logger.debug(f&quot;Not deleting whitelisted {key}&quot;)
+    else:
+        for replica in BUCKETS:
+            _delete(replica, key)
+        deindex_bundle(key)
+</pre></div>
+</div>
+<p>This is a short method that checks if the key to be deleted is in the inclusion list,
+and deletes the key if it is not.</p>
+<p>There is one deletion queue per stage.</p>
+</div>
+<div class="section" id="lambda-function-logic">
+<h2>2.2. Lambda Function Logic<a class="headerlink" href="#lambda-function-logic" title="Permalink to this headline">¶</a></h2>
+<p>Each lambda function is spawned by an SQS queue event and has an item that it is tasked with deleting.
+The lambda function is responsible for checking whether the item is okay to delete, or whether it has
+been marked as a special item that should not be deleted.</p>
+<p>Here is a flowchart illustrating the lambda function logic for the <code class="docutils literal notranslate"><span class="pre">dds-delete</span></code> Domovoi app:</p>
+<a class="reference external image-reference" href="img/arch_lambda_logic.png"><img alt="Architecture diagram - dds-delete lambda function logic" src="_images/arch_lambda_logic.png" /></a>
+</div>
+<div class="section" id="inclusion-lists">
+<h2>2.3. Inclusion Lists<a class="headerlink" href="#inclusion-lists" title="Permalink to this headline">¶</a></h2>
+<p>It is important to be able to mark files to be saved, in addition to marking files to be deleted. This is the
+purpose of the inclusion list, which is stored in the cloud as a DynamoDB table. Any file, blob, or bundle in
+this list will always survive deletion.</p>
+<p>As described above, each SQS queue event spawns a lambda function to process the item(s) to be deleted.
+In the call to <code class="docutils literal notranslate"><span class="pre">dds.delete()</span></code>, the lambda function will compare the key of the file it is supposed to
+delete to the keys in the inclusion list. If the file is in the inclusion list, the lambda function will
+exit without touching the file. This architecture (using a highly scalable database to store the inclusion list)
+allows the lambda swarm to scale without creating a bottleneck with the inclusion list lookup step.</p>
+<p>To save specific items from being deleted, an inclusion list should be assembled in a text file. An operator can
+then use the script at <code class="docutils literal notranslate"><span class="pre">scripts/populate_whitelist.py</span></code>
+<a class="reference external" href="https://github.com/HumanCellAtlas/kharon/blob/master/scripts/populate_whitelist.py">(link)</a>
+and pass the file containing the inclusion list, and each item in the inclusion list file will be added to the
+DynamoDB inclusion list.</p>
+<p>Note: it is good practice to include the stage name in the inclusion list filename.</p>
+<p>Example:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ cat inclusion_list.dev.txt
+bundles/b1d7cbc3-179d-44e1-8c6f-cbdb44f94ac9.2019-11-20T220640.158388Z
+bundles/4b735dfa-7a2d-4d08-930c-8dbce0810dba.2019-11-20T220107.998749Z
+bundles/5cb665f4-97bb-4176-8ec2-1b83b95c1bc0.2019-02-11T171739.925160Z
+
+$ python scripts/populate_whitelist.py inclusion_list.dev.txt
+</pre></div>
+</div>
+</div>
+<div class="section" id="deletion-lists">
+<h2>2.4. Deletion Lists<a class="headerlink" href="#deletion-lists" title="Permalink to this headline">¶</a></h2>
+<p>A deletion list is a list of files that the DSS explicitly wishes to delete. This is typically a file containing
+files, bundles, or blobs to mark for physical deletion. No “master” deletion list is stored in the cloud, since
+the deletion queue itself can be thought of as the “master” deletion list.</p>
+<p>To delete specific items, a deletion list should be assembled in a text file. An operator can then use the script
+at <code class="docutils literal notranslate"><span class="pre">scripts/queue_delete.py</span></code> <a class="reference external" href="https://github.com/HumanCellAtlas/kharon/blob/master/scripts/queue_delete.py">(link)</a> and pass
+the file containing the deletion list.</p>
+<p>Note: it is good practice to include the stage name in the deletion list filename.</p>
+<p>Example:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ cat deletion_list.dev.txt
+bundles/d8f7f78d-1c77-49cc-b934-28d0da11c6d0.2019-08-14T102354.922428Z
+files/d75b202a-3697-41f4-a3ab-8fdfe32dc2cc.2019-08-12T132717.497000Z
+blobs/7160bf0d75fb07a83591d6a976a6fcd757b66b41ad7da746d91ae2c42cd568c7.9f693926b1fc457e9031db7b45a59fbc36e0eeae.7961b0c35564e1afc3a9eadfb0d30334.cb233bbd
+files/217342d9-ae77-40d3-897c-90986c523a08.2019-08-12T132717.633000Z
+
+$ python scripts/queue_delete.py deletion_list.dev.txt
+</pre></div>
+</div>
+<p>Alternatively, specific file, bundle, or blob identifiers can be passed to the script:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ python scripts/queue_delete.py bundles/c6bf5219-92ac-4ffb-88a3-0b8df3a70125.2019-11-22T005022.190038Z
+</pre></div>
+</div>
+</div>
+<div class="section" id="carry-over-inclusion-lists">
+<h2>2.5. Carry-Over Inclusion Lists<a class="headerlink" href="#carry-over-inclusion-lists" title="Permalink to this headline">¶</a></h2>
+<p>When regular deletion events occur, the inclusion list between events does not typically change much.
+The DSS team has found it useful to maintain a plain text version of the inclusion list that is used
+as a single point of truth and kept up to date. This makes it easier to repopulate the DynamoDB inclusion
+list, and makes it easier to control changes in the inclusion list (e.g., version control).</p>
+</div>
+<div class="section" id="cleanup-operations">
+<h2>2.6. Cleanup Operations<a class="headerlink" href="#cleanup-operations" title="Permalink to this headline">¶</a></h2>
+<p>Cleanup operations performed for a given stage will delete all files on that stage except those on the inclusion
+list. Cleanup operations do not use deletion lists - they add every file and bundle in the stage to the deletion
+queue, and delete any files or bundles that are not on the inclusion list.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Kharon</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="deletion.html">1. Deletion in the HCA</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">2. Kharon Cloud Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">3. Installing Kharon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deploy.html">4. Deploying Kharon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="runbook.html">5. Kharon Runbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">6. Kharon Testing and CI/CD</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="deletion.html" title="previous chapter">1. Deletion in the HCA</a></li>
+      <li>Next: <a href="install.html" title="next chapter">3. Installing Kharon</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Human Cell Atlas.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/arch.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

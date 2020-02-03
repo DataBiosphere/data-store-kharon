@@ -1,0 +1,176 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>1. Deletion in the HCA &#8212; Kharon  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="2. Kharon Cloud Architecture" href="arch.html" />
+    <link rel="prev" title="Welcome to Kharon’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="deletion-in-the-hca">
+<h1>1. Deletion in the HCA<a class="headerlink" href="#deletion-in-the-hca" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="definitions">
+<h2>1.1. Definitions<a class="headerlink" href="#definitions" title="Permalink to this headline">¶</a></h2>
+<p><strong>Blob</strong>: The fundamental unit of data in the data store.</p>
+<p><strong>Bundle</strong>: A collection of related files. A bundle consists of pointers to particular files in the data store.</p>
+<p><strong>Data</strong>: In the context of the data store, “data” may refer to either files or bundles (groups of files).</p>
+<p><strong>Deletion queue</strong>: A queue of items in the data store that should be physically deleted. This queue is processed
+on a regular, scheduled basis.</p>
+<p><strong>File</strong>: A pointer to a blob. Two files may point to the same blob if their contents are identical.</p>
+<p><strong>Logical delete</strong>: The process of “soft” deletion of data. Occurs by replacing the latest version of the data with
+a new version. The previous version is hidden behind a deletion marker (a.k.a. a “tombstone”) and is unavailable to
+users through the API.</p>
+<p><strong>Physical delete</strong>: The process of “hard” deletion of data. Occurs by permanent deletion of data from the data store.</p>
+<p><strong>Tombstone</strong>: A marker used to indicate that a particular version of data has been logically deleted and superseded
+by a newer version.</p>
+</div>
+<div class="section" id="dss-data-model">
+<h2>1.2. DSS Data Model<a class="headerlink" href="#dss-data-model" title="Permalink to this headline">¶</a></h2>
+<p>Before we discuss deletion of data, we provide a summary of the data model used in the data store.</p>
+<a class="reference external image-reference" href="img/bundles_files_blobs.png"><img alt="Data store data model - bundle, file, and blob relationships" src="_images/bundles_files_blobs.png" /></a>
+<p>The fundamental unit of data in the data store is a blob. There is always a one-to-one correspondence between files
+and blobs.</p>
+<p>Each file in the data store is a pointer to a blob in the data store.  Two files that have different names but the
+exact same content will point to the same blob.</p>
+<p>Each bundle in the data store is a pointer to a file or group of files. It is valid for multiple bundles to share
+the same file.</p>
+<p>Users can delete or restore files and bundles using the data store API (with appropriate permissions).</p>
+<p>Users and operators may perform deletion (logical or physical) of files and bundles using the data store API
+(with appropriate permissions).</p>
+</div>
+<div class="section" id="deletion-rfc">
+<h2>1.3. Deletion RFC<a class="headerlink" href="#deletion-rfc" title="Permalink to this headline">¶</a></h2>
+<p>The decision of whether to perform a logical deletion or a physical deletion should be decided using the
+<a class="reference external" href="https://github.com/HumanCellAtlas/dcp-community/blob/master/rfcs/text/0004-dss-deletion-process.md">deletion RFC</a>
+and the deletion SOP (TBA) as a guide.</p>
+<p>Users and operators requesting the deletion of files or bundles use the API and make two calls - one call to
+request the deletion (which returns information about the data to be deleted), and one call to confirm deletion.
+Here we cover what happens once the data store receives the confirmed deletion requests.</p>
+<div class="section" id="logical-deletion">
+<h3>1.3.1. Logical Deletion<a class="headerlink" href="#logical-deletion" title="Permalink to this headline">¶</a></h3>
+<p>For logical deletion of files, the individual file is replaced with a tombstone marker, and future attempts to
+access that version of that file will return a 410 error.</p>
+<p>For logical deletion of bundles, the bundle is replaced with a tombstone marker, and future attempts to access that
+version of that bundle will return a 410 error.</p>
+<p>If no version is specified for a deletion operation, all versions of the file or bundle will be tombstoned and
+requests to access any version of that resource will return a 410 error.</p>
+<p>(Note: tombstoned files are not technically considered logically deleted, since someone with a direct link to the
+underlying blob in the data store can still access the data that was in the file.)</p>
+</div>
+<div class="section" id="physical-deletion">
+<h3>1.3.2. Physical Deletion<a class="headerlink" href="#physical-deletion" title="Permalink to this headline">¶</a></h3>
+<p>For physical deletion of files, the individual file is replaced with a tombstone marker (like with logical
+deletion). However, the file is also added to the deletion queue, which will schedule it for permanent deletion
+when the queue is next processed.</p>
+<p>For physical deletion of bundles, the individual bundle is replaced with a tombstone marker and added to the
+deletion queue. <em>Additionally,</em> however, each file in that bundle is also tombstoned and added to the deletion
+queue.</p>
+<p><strong>TODO: add info about what happens to non-deleted bundles that refer to physically deleted files (&#64;chmreid)</strong></p>
+<p>Once a file or bundle is physically deleted, direct links to the data will become invalid.</p>
+</div>
+</div>
+<div class="section" id="gdpr">
+<h2>1.4. GDPR<a class="headerlink" href="#gdpr" title="Permalink to this headline">¶</a></h2>
+<p><strong>TODO: include GDPR procedure (&#64;chmreid)</strong></p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Kharon</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">1. Deletion in the HCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="arch.html">2. Kharon Cloud Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">3. Installing Kharon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deploy.html">4. Deploying Kharon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="runbook.html">5. Kharon Runbook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">6. Kharon Testing and CI/CD</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to Kharon’s documentation!</a></li>
+      <li>Next: <a href="arch.html" title="next chapter">2. Kharon Cloud Architecture</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Human Cell Atlas.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/deletion.md.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
