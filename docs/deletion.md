@@ -47,7 +47,7 @@ Users and operators may perform deletion (logical or physical) of files and bund
 
 The decision of whether to perform a logical deletion or a physical deletion should be decided using the
 [deletion RFC](https://github.com/HumanCellAtlas/dcp-community/blob/master/rfcs/text/0004-dss-deletion-process.md)
-and the deletion SOP (TBA) as a guide.
+in the Human Cell Atlas (HCA) project as a guide.
 
 Users and operators requesting the deletion of files or bundles use the API and make two calls - one call to
 request the deletion (which returns information about the data to be deleted), and one call to confirm deletion.
@@ -77,10 +77,7 @@ For physical deletion of bundles, the individual bundle is replaced with a tombs
 deletion queue. _Additionally,_ however, each file in that bundle is also tombstoned and added to the deletion
 queue. 
 
-**TODO: add info about what happens to non-deleted bundles that refer to physically deleted files (@chmreid)**
-
 Once a file or bundle is physically deleted, direct links to the data will become invalid.
 
-### GDPR
+**TODO: add info about what happens to non-deleted bundles that refer to physically deleted files (@chmreid)**
 
-**TODO: include GDPR procedure (@chmreid)**
