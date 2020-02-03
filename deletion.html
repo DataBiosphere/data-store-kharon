@@ -67,7 +67,7 @@ the same file.</p>
 <h2>1.3. Deletion RFC<a class="headerlink" href="#deletion-rfc" title="Permalink to this headline">¶</a></h2>
 <p>The decision of whether to perform a logical deletion or a physical deletion should be decided using the
 <a class="reference external" href="https://github.com/HumanCellAtlas/dcp-community/blob/master/rfcs/text/0004-dss-deletion-process.md">deletion RFC</a>
-and the deletion SOP (TBA) as a guide.</p>
+in the Human Cell Atlas (HCA) project as a guide.</p>
 <p>Users and operators requesting the deletion of files or bundles use the API and make two calls - one call to
 request the deletion (which returns information about the data to be deleted), and one call to confirm deletion.
 Here we cover what happens once the data store receives the confirmed deletion requests.</p>
@@ -90,13 +90,9 @@ when the queue is next processed.</p>
 <p>For physical deletion of bundles, the individual bundle is replaced with a tombstone marker and added to the
 deletion queue. <em>Additionally,</em> however, each file in that bundle is also tombstoned and added to the deletion
 queue.</p>
-<p><strong>TODO: add info about what happens to non-deleted bundles that refer to physically deleted files (&#64;chmreid)</strong></p>
 <p>Once a file or bundle is physically deleted, direct links to the data will become invalid.</p>
+<p><strong>TODO: add info about what happens to non-deleted bundles that refer to physically deleted files (&#64;chmreid)</strong></p>
 </div>
-</div>
-<div class="section" id="gdpr">
-<h2>1.4. GDPR<a class="headerlink" href="#gdpr" title="Permalink to this headline">¶</a></h2>
-<p><strong>TODO: include GDPR procedure (&#64;chmreid)</strong></p>
 </div>
 </div>
 

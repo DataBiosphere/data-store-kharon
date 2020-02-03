@@ -1,6 +1,6 @@
 Kharon Testing and CI/CD
 --------------------------
 
-How to run kharon tests
+TBA
 
-Notes on Kharon's CI/CD
+(TODO @chmreid: How to run kharon tests? Notes on kharon CI/CD)
