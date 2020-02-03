@@ -13,7 +13,7 @@ creates an event from each item. Those items then trigger lambda functions to pr
 ![Architecture diagram - deletion queue and domovoi app](img/arch_domovoi.png)
 
 The Domovoi app code that is triggered by SQS queue events is in `daemons/dds-delete/app.py`
-[(link)](https://github.com/DataBiosphere/data-store-kharon/blob/master/daemons/dds-delete/app.py).
+[(link to dss-delete app)](https://github.com/DataBiosphere/data-store-kharon/blob/master/daemons/dds-delete/app.py).
 
 ```text
 @app.sqs_queue_subscriber("dds-delete-" + os.environ["DDS_DEPLOYMENT_STAGE"])
@@ -32,7 +32,7 @@ lambda function to process the item, enables a massive scale-up of deletion even
 functions.
 
 The Kharon delete method, called by the lambda swarm on each queue item, is in `dds/__init__.py`
-[(link)](https://github.com/DataBiosphere/data-store-kharon/blob/master/dds/__init__.py).
+[(link to dds init)](https://github.com/DataBiosphere/data-store-kharon/blob/master/dds/__init__.py).
 
 ```text
 def delete(key):
