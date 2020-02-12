@@ -18,8 +18,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'Kharon'
-copyright = '2019, Human Cell Atlas'
-author = 'Human Cell Atlas'
+copyright = ''
+author = ''
 
 
 # -- General configuration ---------------------------------------------------
