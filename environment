@@ -32,7 +32,7 @@ DDS_GCP_CREDENTIALS_SECRET="gcp-credentials.json"
 
 DDS_INFRA_TAG_PROJECT=dcp
 DDS_INFRA_TAG_SERVICE=dss
-DDS_INFRA_TAG_OWNER="chmreid@ucsc.edu"
+DDS_INFRA_TAG_OWNER="team-redwood-group@ucsc.edu"
 
 DSS_S3_BUCKET_TEST_FIXTURES="${DDS_PLATFORM}-dds-${DDS_DEPLOYMENT_STAGE}-test-fixtures"
 
