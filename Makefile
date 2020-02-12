@@ -53,18 +53,24 @@ create-inclusion-list-parts:
 	mkdir -p $(DIR)
 	split -a 10 -l 20 $(INCLUSIONLIST) $(DIR)/
 
-refresh_all_requirements:
+refresh_requirements:
 	@echo -n '' >| requirements.txt
 	@if [ $$(uname -s) == "Darwin" ]; then sleep 1; fi  # this is require because Darwin HFS+ only has second-resolution for timestamps.
 	@touch requirements.txt.in
 	@$(MAKE) requirements.txt
+
+refresh_docs_requirements:
+	@echo -n '' >| requirements-docs.txt
+	@if [ $$(uname -s) == "Darwin" ]; then sleep 1; fi
+	@touch requirements-docs.txt.in
+	@$(MAKE) requirements-docs.txt
 
 requirements.txt requirements-docs.txt: %.txt : %.txt.in
 	[ ! -e .requirements-env ] || exit 1
 	virtualenv -p $(shell which python3) .$<-env
 	.$<-env/bin/pip install -r $@
 	.$<-env/bin/pip install -r $<
-	echo "# You should not edit this file directly.  Instead, you should edit $<." >| $@
+	@echo "# You should not edit this file directly.  Instead, you should edit $<." >| $@
 	.$<-env/bin/pip freeze >> $@
 	rm -rf .$<-env
 #	scripts/find_missing_wheels.py requirements.txt # Disabled by akislyuk (circular dependency issues)
@@ -78,4 +84,4 @@ clean:
 	rm -rf temp_domovoi
 	rm -rf dds-dependencies-${DSS_DEPLOYMENT_STAGE}.zip
 
-.PHONY: all lint mypy test deploy deploy-daemons infra refresh_all_requirements, requirements.txt
+.PHONY: all lint mypy test deploy deploy-daemons infra refresh_requirements refresh_docs_requirements requirements.txt requirements-docs.txt
