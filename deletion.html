@@ -4,14 +4,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>1. Deletion in the HCA &#8212; Kharon  documentation</title>
+    <title>1. Deletion in the Data Store &#8212; Kharon  documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="2. Kharon Cloud Architecture" href="arch.html" />
@@ -32,10 +32,10 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="deletion-in-the-hca">
-<h1>1. Deletion in the HCA<a class="headerlink" href="#deletion-in-the-hca" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="deletion-in-the-data-store">
+<h1><span class="section-number">1. </span>Deletion in the Data Store<a class="headerlink" href="#deletion-in-the-data-store" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="definitions">
-<h2>1.1. Definitions<a class="headerlink" href="#definitions" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">1.1. </span>Definitions<a class="headerlink" href="#definitions" title="Permalink to this headline">¶</a></h2>
 <p><strong>Blob</strong>: The fundamental unit of data in the data store.</p>
 <p><strong>Bundle</strong>: A collection of related files. A bundle consists of pointers to particular files in the data store.</p>
 <p><strong>Data</strong>: In the context of the data store, “data” may refer to either files or bundles (groups of files).</p>
@@ -50,7 +50,7 @@ users through the API.</p>
 by a newer version.</p>
 </div>
 <div class="section" id="dss-data-model">
-<h2>1.2. DSS Data Model<a class="headerlink" href="#dss-data-model" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">1.2. </span>DSS Data Model<a class="headerlink" href="#dss-data-model" title="Permalink to this headline">¶</a></h2>
 <p>Before we discuss deletion of data, we provide a summary of the data model used in the data store.</p>
 <a class="reference external image-reference" href="img/bundles_files_blobs.png"><img alt="Data store data model - bundle, file, and blob relationships" src="_images/bundles_files_blobs.png" /></a>
 <p>The fundamental unit of data in the data store is a blob. There is always a one-to-one correspondence between files
@@ -64,7 +64,7 @@ the same file.</p>
 (with appropriate permissions).</p>
 </div>
 <div class="section" id="deletion-rfc">
-<h2>1.3. Deletion RFC<a class="headerlink" href="#deletion-rfc" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">1.3. </span>Deletion RFC<a class="headerlink" href="#deletion-rfc" title="Permalink to this headline">¶</a></h2>
 <p>The decision of whether to perform a logical deletion or a physical deletion should be decided using the
 <a class="reference external" href="https://github.com/HumanCellAtlas/dcp-community/blob/master/rfcs/text/0004-dss-deletion-process.md">deletion RFC</a>
 in the Human Cell Atlas (HCA) project as a guide.</p>
@@ -72,7 +72,7 @@ in the Human Cell Atlas (HCA) project as a guide.</p>
 request the deletion (which returns information about the data to be deleted), and one call to confirm deletion.
 Here we cover what happens once the data store receives the confirmed deletion requests.</p>
 <div class="section" id="logical-deletion">
-<h3>1.3.1. Logical Deletion<a class="headerlink" href="#logical-deletion" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">1.3.1. </span>Logical Deletion<a class="headerlink" href="#logical-deletion" title="Permalink to this headline">¶</a></h3>
 <p>For logical deletion of files, the individual file is replaced with a tombstone marker, and future attempts to
 access that version of that file will return a 410 error.</p>
 <p>For logical deletion of bundles, the bundle is replaced with a tombstone marker, and future attempts to access that
@@ -83,7 +83,7 @@ requests to access any version of that resource will return a 410 error.</p>
 underlying blob in the data store can still access the data that was in the file.)</p>
 </div>
 <div class="section" id="physical-deletion">
-<h3>1.3.2. Physical Deletion<a class="headerlink" href="#physical-deletion" title="Permalink to this headline">¶</a></h3>
+<h3><span class="section-number">1.3.2. </span>Physical Deletion<a class="headerlink" href="#physical-deletion" title="Permalink to this headline">¶</a></h3>
 <p>For physical deletion of files, the individual file is replaced with a tombstone marker (like with logical
 deletion). However, the file is also added to the deletion queue, which will schedule it for permanent deletion
 when the queue is next processed.</p>
@@ -114,7 +114,7 @@ queue.</p>
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">1. Deletion in the HCA</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">1. Deletion in the Data Store</a></li>
 <li class="toctree-l1"><a class="reference internal" href="arch.html">2. Kharon Cloud Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">3. Installing Kharon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="deploy.html">4. Deploying Kharon</a></li>
@@ -127,7 +127,7 @@ queue.</p>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="index.html" title="previous chapter">Welcome to Kharon’s documentation!</a></li>
-      <li>Next: <a href="arch.html" title="next chapter">2. Kharon Cloud Architecture</a></li>
+      <li>Next: <a href="arch.html" title="next chapter"><span class="section-number">2. </span>Kharon Cloud Architecture</a></li>
   </ul></li>
 </ul>
 </div>
@@ -140,7 +140,7 @@ queue.</p>
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
 
 
 
@@ -154,10 +154,10 @@ queue.</p>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2019, Human Cell Atlas.
+      &copy;.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

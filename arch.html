@@ -7,15 +7,15 @@
     <title>2. Kharon Cloud Architecture &#8212; Kharon  documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="3. Installing Kharon" href="install.html" />
-    <link rel="prev" title="1. Deletion in the HCA" href="deletion.html" />
+    <link rel="prev" title="1. Deletion in the Data Store" href="deletion.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -33,9 +33,9 @@
           <div class="body" role="main">
             
   <div class="section" id="kharon-cloud-architecture">
-<h1>2. Kharon Cloud Architecture<a class="headerlink" href="#kharon-cloud-architecture" title="Permalink to this headline">¶</a></h1>
+<h1><span class="section-number">2. </span>Kharon Cloud Architecture<a class="headerlink" href="#kharon-cloud-architecture" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="deletion-queue">
-<h2>2.1. Deletion Queue<a class="headerlink" href="#deletion-queue" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.1. </span>Deletion Queue<a class="headerlink" href="#deletion-queue" title="Permalink to this headline">¶</a></h2>
 <p>The central idea behind Kharon is the deletion queue.</p>
 <p>When items are marked for physical deletion, they are added to the queue. The queue will accumulate items until the
 next deletion event is scheduled (approximately daily) or the deletion event is manually triggered via Kharon’s
@@ -73,7 +73,7 @@ and deletes the key if it is not.</p>
 <p>There is one deletion queue per stage.</p>
 </div>
 <div class="section" id="lambda-function-logic">
-<h2>2.2. Lambda Function Logic<a class="headerlink" href="#lambda-function-logic" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.2. </span>Lambda Function Logic<a class="headerlink" href="#lambda-function-logic" title="Permalink to this headline">¶</a></h2>
 <p>Each lambda function is spawned by an SQS queue event and has an item that it is tasked with deleting.
 The lambda function is responsible for checking whether the item is okay to delete, or whether it has
 been marked as a special item that should not be deleted.</p>
@@ -81,7 +81,7 @@ been marked as a special item that should not be deleted.</p>
 <a class="reference external image-reference" href="img/arch_lambda_logic.png"><img alt="Architecture diagram - dds-delete lambda function logic" src="_images/arch_lambda_logic.png" /></a>
 </div>
 <div class="section" id="inclusion-lists">
-<h2>2.3. Inclusion Lists<a class="headerlink" href="#inclusion-lists" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.3. </span>Inclusion Lists<a class="headerlink" href="#inclusion-lists" title="Permalink to this headline">¶</a></h2>
 <p>It is important to be able to mark files to be saved, in addition to marking files to be deleted. This is the
 purpose of the inclusion list, which is stored in the cloud as a DynamoDB table. Any file, blob, or bundle in
 this list will always survive deletion.</p>
@@ -107,7 +107,7 @@ $ python scripts/populate_whitelist.py inclusion_list.dev.txt
 </div>
 </div>
 <div class="section" id="deletion-lists">
-<h2>2.4. Deletion Lists<a class="headerlink" href="#deletion-lists" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.4. </span>Deletion Lists<a class="headerlink" href="#deletion-lists" title="Permalink to this headline">¶</a></h2>
 <p>A deletion list is a list of files that the DSS explicitly wishes to delete. This is typically a file containing
 files, bundles, or blobs to mark for physical deletion. No “master” deletion list is stored in the cloud, since
 the deletion queue itself can be thought of as the “master” deletion list.</p>
@@ -131,14 +131,14 @@ $ python scripts/queue_delete.py deletion_list.dev.txt
 </div>
 </div>
 <div class="section" id="carry-over-inclusion-lists">
-<h2>2.5. Carry-Over Inclusion Lists<a class="headerlink" href="#carry-over-inclusion-lists" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.5. </span>Carry-Over Inclusion Lists<a class="headerlink" href="#carry-over-inclusion-lists" title="Permalink to this headline">¶</a></h2>
 <p>When regular deletion events occur, the inclusion list between events does not typically change much.
 The DSS team has found it useful to maintain a plain text version of the inclusion list that is used
 as a single point of truth and kept up to date. This makes it easier to repopulate the DynamoDB inclusion
 list, and makes it easier to control changes in the inclusion list (e.g., version control).</p>
 </div>
 <div class="section" id="cleanup-operations">
-<h2>2.6. Cleanup Operations<a class="headerlink" href="#cleanup-operations" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">2.6. </span>Cleanup Operations<a class="headerlink" href="#cleanup-operations" title="Permalink to this headline">¶</a></h2>
 <p>Cleanup operations performed for a given stage will delete all files on that stage except those on the inclusion
 list. Cleanup operations do not use deletion lists - they add every file and bundle in the stage to the deletion
 queue, and delete any files or bundles that are not on the inclusion list.</p>
@@ -163,7 +163,7 @@ queue, and delete any files or bundles that are not on the inclusion list.</p>
 
 <h3>Navigation</h3>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="deletion.html">1. Deletion in the HCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deletion.html">1. Deletion in the Data Store</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">2. Kharon Cloud Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">3. Installing Kharon</a></li>
 <li class="toctree-l1"><a class="reference internal" href="deploy.html">4. Deploying Kharon</a></li>
@@ -175,8 +175,8 @@ queue, and delete any files or bundles that are not on the inclusion list.</p>
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="deletion.html" title="previous chapter">1. Deletion in the HCA</a></li>
-      <li>Next: <a href="install.html" title="next chapter">3. Installing Kharon</a></li>
+      <li>Previous: <a href="deletion.html" title="previous chapter"><span class="section-number">1. </span>Deletion in the Data Store</a></li>
+      <li>Next: <a href="install.html" title="next chapter"><span class="section-number">3. </span>Installing Kharon</a></li>
   </ul></li>
 </ul>
 </div>
@@ -189,7 +189,7 @@ queue, and delete any files or bundles that are not on the inclusion list.</p>
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
 
 
 
@@ -203,10 +203,10 @@ queue, and delete any files or bundles that are not on the inclusion list.</p>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2019, Human Cell Atlas.
+      &copy;.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
