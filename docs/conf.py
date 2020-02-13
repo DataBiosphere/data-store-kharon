@@ -18,8 +18,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'Kharon'
-copyright = '2019, Human Cell Atlas'
-author = 'Human Cell Atlas'
+copyright = '2017 Human Cell Atlas, 2020 University of California Santa Cruz'
+author = 'University of California Santa Cruz Genomics Institute'
 
 
 # -- General configuration ---------------------------------------------------

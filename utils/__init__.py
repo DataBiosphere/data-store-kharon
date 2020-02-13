@@ -31,7 +31,7 @@ def prepare_environment():
     """
     dss_parms = json.loads(
         boto3.client("ssm").get_parameter(
-            Name=f"/dcp/dss/{os.environ['DDS_DEPLOYMENT_STAGE']}/environment"
+            Name=f"/{os.environ['DDS_SECRETS_STORE']}/{os.environ['DDS_DEPLOYMENT_STAGE']}/environment"
         )['Parameter']['Value']
     )
     os.environ['DSS_S3_BUCKET'] = dss_parms['DSS_S3_BUCKET']

@@ -1,5 +1,5 @@
-Deletion in the HCA
----------------------
+Deletion in the Data Store
+--------------------------
 
 ### Definitions
 
