@@ -11,7 +11,7 @@ import boto3
 import random
 import unittest
 import datetime
-from hca.dss import DSSClient
+from dbio.dss import DSSClient
 from cloud_blobstore import BlobNotFoundError
 
 pkg_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))  # noqa
@@ -19,9 +19,10 @@ sys.path.insert(0, pkg_root)  # noqa
 
 from tests import eventually
 
+store = os.environ['DDS_SECRETS_STORE']
 stage = os.environ['DDS_DEPLOYMENT_STAGE']
 test_fixtures_bucket = os.environ['DSS_S3_BUCKET_TEST_FIXTURES']
-parm = boto3.client("ssm").get_parameter(Name=f"/dcp/dss/{stage}/environment")
+parm = boto3.client("ssm").get_parameter(Name=f"/{store}/{stage}/environment")
 os.environ.update(json.loads(parm['Parameter']['Value']))
 
 
@@ -30,7 +31,7 @@ import dds  # noqa
 
 class TestConfig(unittest.TestCase):
     def setUp(self):
-        swag_url = f"https://dss.{stage}.data.humancellatlas.org/v1/swagger.json"
+        swag_url = f"https://dss.{stage}.ucsc-cgp-redwood.org/v1/swagger.json"
         self.ddb_client = boto3.client('dynamodb')
         self.dss_client = DSSClient(swagger_url=swag_url)
         self.handles = {
