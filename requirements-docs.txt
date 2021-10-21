@@ -1,6 +1,6 @@
 # You should not edit this file directly.  Instead, you should edit requirements-docs.txt.in.
 alabaster==0.7.12
-Babel==2.8.0
+Babel==2.9.1
 certifi==2019.11.28
 chardet==3.0.4
 docutils==0.15.2
